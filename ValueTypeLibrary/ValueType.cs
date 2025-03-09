@@ -38,15 +38,15 @@ public abstract class ValueType<T> where T : ValueType<T>
     private static Func<T, T, bool> CreateEqualsFunc()
     {
         // Define two T-type parameters to represent compared objects.
-        var tParam1 = Expression.Parameter(typeof(T), "tObj1");
-        var tParam2 = Expression.Parameter(typeof(T), "tObj2");
+        var tObjParam1 = Expression.Parameter(typeof(T), "tObj1");
+        var tObjParam2 = Expression.Parameter(typeof(T), "tObj2");
         var equalCallExpressions = new List<Expression>(propertiesInfo.Length);
 
         // For each property, we call the Equals method, which compares values of properties in two objects.
         foreach (var property in propertiesInfo)
         {
-            var propertyAccess1 = Expression.Property(tParam1, property);
-            var propertyAccess2 = Expression.Property(tParam2, property);
+            var propertyAccess1 = Expression.Property(tObjParam1, property);
+            var propertyAccess2 = Expression.Property(tObjParam2, property);
 
             // Choose a method with the correct signature to prevent boxing, if possible.
             var equalsMethodInfo = property.PropertyType.GetMethod("Equals", [property.PropertyType]) ??
@@ -57,7 +57,7 @@ public abstract class ValueType<T> where T : ValueType<T>
             // For value-types, further null-checks are not appropriate and will cause execution-errors.
             if (property.PropertyType.IsValueType)
             {
-                // Add "p1.Equals(p2)" expression for value-type properties.
+                // Add "p1.Equals(p2)" expressions.
                 equalCallExpressions.Add(equalsCallExpression);
                 continue;
             }
@@ -81,7 +81,7 @@ public abstract class ValueType<T> where T : ValueType<T>
         Expression body = equalCallExpressions.Aggregate(Expression.AndAlso);
 
         // Compile the result expression into a delegate and save it for reuse.
-        var lambda = Expression.Lambda<Func<T, T, bool>>(body, tParam1, tParam2);
+        var lambda = Expression.Lambda<Func<T, T, bool>>(body, tObjParam1, tObjParam2);
 
         return lambda.Compile();
     }
@@ -89,13 +89,13 @@ public abstract class ValueType<T> where T : ValueType<T>
     private static Func<T, int> CreateHashCodeFunc()
     {
         // Define one T-type parameter for an object whose hash code we are calculating.
-        var tParam = Expression.Parameter(typeof(T), "tObj");
+        var tObjParam = Expression.Parameter(typeof(T), "tObj");
         var hashCodeExpressions = new List<Expression>(propertiesInfo.Length);
         
         // For each property, we call the GetHashCode method.
-        foreach (var property in propertiesInfo)
+        foreach (var propertyInfo in propertiesInfo)
         {
-            var propertyAccess = Expression.Property(tParam, property);
+            var propertyAccess = Expression.Property(tObjParam, propertyInfo);
             var getHashCodeCall = Expression.Call(propertyAccess, "GetHashCode", null);
             hashCodeExpressions.Add(getHashCodeCall);
         }
@@ -112,7 +112,7 @@ public abstract class ValueType<T> where T : ValueType<T>
         }
 
         // Compile expression into a delegate.
-        var lambda = Expression.Lambda<Func<T, int>>(aggregateExpr, tParam);
+        var lambda = Expression.Lambda<Func<T, int>>(aggregateExpr, tObjParam);
         return lambda.Compile();
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using FluentAssertions;
 using NUnit.Framework;
 using ValueTypeLibrary.Tests.TestValueTypes;
 
 namespace ValueTypeLibrary.Tests;
 
 [TestFixture]
+[SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
 public class ValueType_Tests
 {
     [Test]
@@ -70,7 +71,7 @@ public class ValueType_Tests
 		const string errorMessage = $"{nameof(PersonName)} should contain method public bool {equalsMethodName}({nameof(PersonName)} name)";
 		
         Assert.That(methodInfo, Is.Not.Null, errorMessage);
-        Assert.That(methodInfo.IsPublic, Is.True, errorMessage);
+        Assert.That(methodInfo!.IsPublic, Is.True, errorMessage);
         Assert.That(methodInfo.ReturnType == typeof(bool), Is.True, errorMessage);
         Assert.That(methodInfo.GetParameters()[0].ParameterType == typeof(PersonName), Is.True, errorMessage);
 	}
@@ -105,8 +106,8 @@ public class ValueType_Tests
 	[Test]
 	public void SameAddressesAreEqual()
 	{
-		var address1 = new Address("ул. Тургенева", "4");
-		var address2 = new Address("ул. Тургенева", "4");
+		var address1 = new Address("Turgenev Street", "4");
+		var address2 = new Address("Turgenev Street", "4");
         
         Assert.That(address1.Equals((object) address2), Is.True);
 	}

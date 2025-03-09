@@ -4,9 +4,9 @@ namespace ValueTypeLibrary.Tests.TestValueTypes;
 
 public class Person : ValueType<Person>
 {
-    public PersonName Name { get; }
-    public decimal Height { get; }
-    public DateTime BirthDate { get; }
+    public PersonName Name { get; init; }
+    public decimal Height { get; init; }
+    public DateTime BirthDate { get; init; }
 
     public Person(PersonName name, decimal height, DateTime birthDate)
     {

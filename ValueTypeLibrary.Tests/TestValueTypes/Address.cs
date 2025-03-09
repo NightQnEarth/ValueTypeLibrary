@@ -2,8 +2,8 @@
 
 public class Address : ValueType<Address>
 {
-    public string Street { get; }
-    public string Building { get; }
+    public string Street { get; init; }
+    public string Building { get; init; }
     
     public Address(string street, string building)
     {
