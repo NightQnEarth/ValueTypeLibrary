@@ -21,7 +21,9 @@ public class PersonName_WithHandCodedMethods : ValueType<PersonName>
 
     public bool Equals(PersonName_WithHandCodedMethods? other)
     {
-        return other != null && FirstName == other.FirstName && LastName == other.LastName;
+        return other != null &&
+               ((FirstName == null && other.FirstName == null) || (FirstName != null && FirstName.Equals(other.FirstName))) &&
+               ((LastName == null && other.LastName == null) || (LastName != null && LastName.Equals(other.LastName)));
     }
 
     public override int GetHashCode()
