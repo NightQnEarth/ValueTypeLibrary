@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValueTypeLibrary", "ValueTy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValueTypeLibrary.Tests", "ValueTypeLibrary.Tests\ValueTypeLibrary.Tests.csproj", "{315FC45C-2DE8-4351-8975-1AAE95F4BE75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValueTypeLibrary_Reflection", "ValueTypeLibrary_Reflection\ValueTypeLibrary_Reflection.csproj", "{1B78871D-9CEA-47C4-BD9C-03E71C64D062}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{315FC45C-2DE8-4351-8975-1AAE95F4BE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{315FC45C-2DE8-4351-8975-1AAE95F4BE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{315FC45C-2DE8-4351-8975-1AAE95F4BE75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B78871D-9CEA-47C4-BD9C-03E71C64D062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B78871D-9CEA-47C4-BD9C-03E71C64D062}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B78871D-9CEA-47C4-BD9C-03E71C64D062}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B78871D-9CEA-47C4-BD9C-03E71C64D062}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
