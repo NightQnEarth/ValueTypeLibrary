@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using NUnit.Framework;
 using ValueTypeLibrary.Tests.TestValueTypes;
@@ -7,7 +6,6 @@ using ValueTypeLibrary.Tests.TestValueTypes;
 namespace ValueTypeLibrary.Tests;
 
 [TestFixture]
-[SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
 public class ValueType_Tests
 {
     [Test]
@@ -33,6 +31,7 @@ public class ValueType_Tests
 		var address = new Address("A", "B");
 		var person = new PersonName("A", "B");
         
+        // ReSharper disable once SuspiciousTypeConversion.Global (for testing purposes)
         Assert.That(address.Equals(person), Is.False);
 	}
 
@@ -67,8 +66,9 @@ public class ValueType_Tests
 	public void HasTypedEqualsMethod()
 	{
         const string equalsMethodName = "Equals";
-		MethodInfo? methodInfo = typeof(PersonName).GetMethod(equalsMethodName, new[] { typeof(PersonName) });
-		const string errorMessage = $"{nameof(PersonName)} should contain method public bool {equalsMethodName}({nameof(PersonName)} name)";
+        const string personName = nameof(PersonName);
+		MethodInfo? methodInfo = typeof(PersonName).GetMethod(equalsMethodName, [typeof(PersonName)]);
+		const string errorMessage = $"{personName} should contain method public bool {equalsMethodName}({personName} name)";
 		
         Assert.That(methodInfo, Is.Not.Null, errorMessage);
         Assert.That(methodInfo!.IsPublic, Is.True, errorMessage);
