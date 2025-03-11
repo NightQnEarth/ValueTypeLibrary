@@ -26,6 +26,6 @@ public abstract class ValueType<T> where T : ValueType<T>
     public override int GetHashCode()
     {
         return propertiesInfo.Select(propertyInfo => propertyInfo.GetValue(this)?.GetHashCode() ?? 0)
-                             .Aggregate(397, (accumulate, next) => unchecked(accumulate * 1019 + next));
+                             .Aggregate(17, (accumulation, propertyHashCode) => unchecked(accumulation * 31 + propertyHashCode));
     }
 }

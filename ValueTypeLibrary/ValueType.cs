@@ -43,19 +43,19 @@ public abstract class ValueType<T> where T : ValueType<T>
         var equalCallExpressions = new List<Expression>(propertiesInfo.Length);
 
         // For each property, we call the Equals method, which compares values of properties in two objects.
-        foreach (var property in propertiesInfo)
+        foreach (var propertyInfo in propertiesInfo)
         {
-            var propertyAccess1 = Expression.Property(tObjParam1, property);
-            var propertyAccess2 = Expression.Property(tObjParam2, property);
+            MemberExpression propertyAccess1 = Expression.Property(tObjParam1, propertyInfo);
+            MemberExpression propertyAccess2 = Expression.Property(tObjParam2, propertyInfo);
 
             // Choose a method with the correct signature to prevent boxing, if possible.
-            var equalsMethodInfo = property.PropertyType.GetMethod("Equals", [property.PropertyType]) ??
-                                   property.PropertyType.GetMethod("Equals", [typeof(object)]) ??
+            var equalsMethodInfo = propertyInfo.PropertyType.GetMethod("Equals", [propertyInfo.PropertyType]) ??
+                                   propertyInfo.PropertyType.GetMethod("Equals", [typeof(object)]) ??
                                    throw new UnreachableException("This error is unreachable, because in any type defined the Object.Equals method.");
             var equalsCallExpression = Expression.Call(propertyAccess1, equalsMethodInfo, propertyAccess2);
 
             // For value-types, further null-checks are not appropriate and will cause execution-errors.
-            if (property.PropertyType.IsValueType)
+            if (propertyInfo.PropertyType.IsValueType)
             {
                 // Add "p1.Equals(p2)" expressions.
                 equalCallExpressions.Add(equalsCallExpression);
@@ -63,12 +63,12 @@ public abstract class ValueType<T> where T : ValueType<T>
             }
 
             // Check that "p1.Equals(p2)" expression will not fall with the NullReferenceException.
-            var isFirstPropertyNotNull = Expression.NotEqual(propertyAccess1, Expression.Constant(null, property.PropertyType));
+            var isFirstPropertyNotNull = Expression.NotEqual(propertyAccess1, Expression.Constant(null, propertyInfo.PropertyType));
             var safeEqualExpression = Expression.AndAlso(isFirstPropertyNotNull, equalsCallExpression);
 
             // Check whether both properties are null.
-            var isFirstPropertyNull = Expression.Equal(propertyAccess1, Expression.Constant(null, property.PropertyType));
-            var isSecondPropertyNull = Expression.Equal(propertyAccess2, Expression.Constant(null, property.PropertyType));
+            var isFirstPropertyNull = Expression.Equal(propertyAccess1, Expression.Constant(null, propertyInfo.PropertyType));
+            var isSecondPropertyNull = Expression.Equal(propertyAccess2, Expression.Constant(null, propertyInfo.PropertyType));
             var areBothPropertiesNull = Expression.AndAlso(isFirstPropertyNull, isSecondPropertyNull);
 
             // Built final expression for reference-type properties: (p1 == null && p2 == null) || (p1 != null && p1.Equals(p2)).
@@ -97,18 +97,32 @@ public abstract class ValueType<T> where T : ValueType<T>
         {
             var propertyAccess = Expression.Property(tObjParam, propertyInfo);
             var getHashCodeCall = Expression.Call(propertyAccess, "GetHashCode", null);
-            hashCodeExpressions.Add(getHashCodeCall);
+            
+            // For value-types, further null-checks are not appropriate and will cause execution-errors.
+            if (propertyInfo.PropertyType.IsValueType)
+            {
+                // Add "p.GetHashCode()" expressions.
+                hashCodeExpressions.Add(getHashCodeCall);
+                continue;
+            }
+            
+            // Check that "p.GetHashCode()" expression will not fall with the NullReferenceException.
+            var isPropertyNotNull = Expression.NotEqual(propertyAccess, Expression.Constant(null, propertyInfo.PropertyType));
+            var safeGetHashCodeCall = Expression.Condition(isPropertyNotNull, getHashCodeCall, Expression.Constant(0, typeof(int)));
+            
+            // Add "p != null ? p.GetHashCode() : 0" expressions.
+            hashCodeExpressions.Add(safeGetHashCodeCall);
         }
 
-        var initialHash = Expression.Constant(397);
+        var initialHash = Expression.Constant(17);
         Expression aggregateExpr = initialHash;
 
-        // Aggregate all hash-codes using the initial value of 397 and the formula unchecked(aggregate * 1019 + next).
-        foreach (var expr in hashCodeExpressions)
+        // Aggregate all hash-codes using the initial value of aggregate = 17 and the formula unchecked(aggregate * 31 + property.GetHashCode()),
+        // Josh Bloch's classic approach.
+        foreach (var propertyHashCode in hashCodeExpressions)
         {
-            var multiply = Expression.Multiply(aggregateExpr, Expression.Constant(1019));
-            var sum = Expression.Add(multiply, expr);
-            aggregateExpr = Expression.Convert(sum, typeof(int));
+            var multiply = Expression.Multiply(aggregateExpr, Expression.Constant(31));
+            aggregateExpr = Expression.Add(multiply, propertyHashCode);
         }
 
         // Compile expression into a delegate.

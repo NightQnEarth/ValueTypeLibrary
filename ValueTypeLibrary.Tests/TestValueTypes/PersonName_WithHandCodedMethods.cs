@@ -28,16 +28,14 @@ public class PersonName_WithHandCodedMethods : ValueType<PersonName>
 
     public override int GetHashCode()
     {
-        var hashCode = 397 * 1019;
-        
         unchecked
         {
-            hashCode += FirstName?.GetHashCode() ?? 0;
-            hashCode *= 1019;
-            hashCode += LastName?.GetHashCode() ?? 0;
-            hashCode *= 1019;
+            var hashCode = 17;
+            
+            hashCode = hashCode * 31 + FirstName?.GetHashCode() ?? 0;
+            hashCode = hashCode * 31 + LastName?.GetHashCode() ?? 0;
+            
+            return hashCode;
         }
-        
-        return hashCode;
     }
 }

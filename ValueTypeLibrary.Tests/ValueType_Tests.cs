@@ -11,10 +11,11 @@ public class ValueType_Tests
     [Test]
 	public void AddressesWithNullsAreEqual()
 	{
-		var address = new Address(null, null);
-		var otherAddress = new Address(null, null);
+		var address1 = new Address(null, null);
+		var address2 = new Address(null, null);
         
-        Assert.That(address.Equals(otherAddress), Is.True);
+        Assert.That(address1.GetHashCode(), Is.EqualTo(address2.GetHashCode()));
+        Assert.That(address1.Equals(address2), Is.True);
 	}
 
 	[Test]
@@ -31,6 +32,7 @@ public class ValueType_Tests
 		var address = new Address("A", "B");
 		var person = new PersonName("A", "B");
         
+        Assert.That(address.GetHashCode(), Is.EqualTo(person.GetHashCode()));
         // ReSharper disable once SuspiciousTypeConversion.Global (for testing purposes)
         Assert.That(address.Equals(person), Is.False);
 	}
@@ -38,10 +40,11 @@ public class ValueType_Tests
 	[Test]
 	public void CompareAddressesWithoutSomeValues()
 	{
-		var address = new Address("A", null);
-		var other = new Address(null, "Y");
+		var address1 = new Address("A", null);
+		var address2 = new Address(null, "Y");
         
-        Assert.That(address.Equals(other), Is.False);
+        Assert.That(address1.GetHashCode(), Is.Not.EqualTo(address2.GetHashCode()));
+        Assert.That(address1.Equals(address2), Is.False);
 	}
 
 	[Test]
@@ -50,16 +53,18 @@ public class ValueType_Tests
 		var person1 = new Person(new PersonName("A", "B"), 180, new DateTime(1988, 2, 29));
 		var person2 = new Person(new PersonName("A", "B"), 180, new DateTime(1988, 2, 29));
 		
+        Assert.That(person1.GetHashCode(), Is.EqualTo(person2.GetHashCode()));
         Assert.That(person1.Equals(person2), Is.True);
 	}
 
 	[Test]
 	public void DifferentAddressesAreNotEqual()
 	{
-		var address = new Address("A", "B");
-		var other = new Address("X", "Y");
+		var address1 = new Address("A", "B");
+		var address2 = new Address("X", "Y");
         
-        Assert.That(address.Equals(other), Is.False);
+        Assert.That(address1.GetHashCode(), Is.Not.EqualTo(address2.GetHashCode()));
+        Assert.That(address1.Equals(address2), Is.False);
 	}
 
 	[Test]
@@ -82,6 +87,7 @@ public class ValueType_Tests
 		var person1 = new Person(new PersonName("A", "B"), 180, new DateTime(1988, 2, 29));
 		var person2 = new Person(new PersonName("A", "XXX"), 180, new DateTime(1988, 2, 29));
 		
+        Assert.That(person1.GetHashCode(), Is.Not.EqualTo(person2.GetHashCode()));
         Assert.That(person1.Equals(person2), Is.False);
 	}
 
@@ -91,6 +97,7 @@ public class ValueType_Tests
 		var person1 = new Person(new PersonName("A", "B"), 180, new DateTime(1988, 2, 29));
 		var person2 = new Person(new PersonName("A", "B"), 180, new DateTime(1988, 2, 28));
 		
+        Assert.That(person1.GetHashCode(), Is.Not.EqualTo(person2.GetHashCode()));
         Assert.That(person1.Equals(person2), Is.False);
 	}
 
@@ -100,6 +107,7 @@ public class ValueType_Tests
 		var person1 = new Person(new PersonName("A", "B"), 180, new DateTime(1988, 2, 29));
 		var person2 = new Person(new PersonName("A", "B"), 181, new DateTime(1988, 2, 29));
 		
+        Assert.That(person1.GetHashCode(), Is.Not.EqualTo(person2.GetHashCode()));
         Assert.That(person1.Equals(person2), Is.False);
 	}
 
@@ -109,6 +117,7 @@ public class ValueType_Tests
 		var address1 = new Address("Turgenev Street", "4");
 		var address2 = new Address("Turgenev Street", "4");
         
+        Assert.That(address1.GetHashCode(), Is.EqualTo(address2.GetHashCode()));
         Assert.That(address1.Equals((object) address2), Is.True);
 	}
 }
