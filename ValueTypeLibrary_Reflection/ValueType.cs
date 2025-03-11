@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 
 namespace ValueTypeLibrary_Reflection;
@@ -8,6 +9,7 @@ namespace ValueTypeLibrary_Reflection;
 ///     As an advantage, one can highlight the simplicity and readability of this approach; however, the cost of this is speed: this code
 ///     runs significantly slower than an Expressions-based implementation.
 /// </summary>
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")] // Just an example class.
 public abstract class ValueType<T> where T : ValueType<T>
 {
     private static readonly PropertyInfo[] propertiesInfo = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
