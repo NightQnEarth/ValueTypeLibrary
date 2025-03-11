@@ -18,7 +18,7 @@ public class ValueType_PerformanceTests
 
     // We can see very rare and interesting behaviour in case of move static fields initialization inline from static constructor.
     // This is due to the initialization order depending on "beforefieldinit" flag.
-    // See Article by Jon Skeet about "C# and beforefieldinit" (https://csharpindepth.com/Articles/BeforeFieldInit).
+    // See Jon Skeet's article "C# and beforefieldinit" (https://csharpindepth.com/Articles/BeforeFieldInit).
     static ValueType_PerformanceTests()
     {
         personNames =

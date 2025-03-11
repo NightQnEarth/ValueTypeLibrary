@@ -16,9 +16,18 @@ namespace ValueTypeLibrary;
 public abstract class ValueType<T> where T : ValueType<T>
 {
     private static readonly PropertyInfo[] propertiesInfo = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+    private static readonly Func<T, T, bool> tObjectsComparer;
+    private static readonly Func<T, int> tObjectHashCodeGenerator;
     
-    private static readonly Func<T, T, bool> tObjectsComparer = CreateEqualsFunc();
-    private static readonly Func<T, int> tObjectHashCodeGenerator = CreateHashCodeFunc();
+    // We build these delegates in a static constructor, rather than in field initializers, to ensure that this happens in advance.
+    // This will prevent unpredictable CLR behavior related to the 'beforefieldinit' flag, which could lead to the compilation of these
+    // delegates immediately before the invocation of the Equals and GetHashCode methods, which may be undesirable.
+    // See Jon Skeet's article "C# and beforefieldinit" (https://csharpindepth.com/Articles/BeforeFieldInit).
+    static ValueType()
+    {
+        tObjectsComparer = CreateEqualsFunc();
+        tObjectHashCodeGenerator = CreateHashCodeFunc();
+    }
     
     public override bool Equals(object? otherObj)
     {
