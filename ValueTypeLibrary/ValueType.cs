@@ -8,17 +8,18 @@ using System.Reflection;
 namespace ValueTypeLibrary;
 
 /// <summary>
-///     The base class for all Value-types, that is, for classes whose instances we consider equal if their corresponding public properties are equal.<br/>
+///     The base class for all Value-types, that is, for classes whose instances we consider equal if their corresponding public properties are equal.<br />
 ///     Thus, ValueType&lt;T> overrides Equals and GetHashCode methods for all inheritors of type T to ensure
-///     correct comparision of instances based on their corresponding public properties.<br/>
-///     This allows for an efficient overriding of the comparision mechanism to value-type paradigm, avoiding redundant, repetitive overriding in each individual class.
+///     correct comparision of instances based on their corresponding public properties.<br />
+///     This allows for an efficient overriding of the comparision mechanism to value-type paradigm, avoiding redundant, repetitive overriding
+///     in each individual class.
 /// </summary>
 public abstract class ValueType<T> where T : ValueType<T>
 {
     private static readonly PropertyInfo[] propertiesInfo = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
     private static readonly Func<T, T, bool> tObjectsComparer;
     private static readonly Func<T, int> tObjectHashCodeGenerator;
-    
+
     // We build these delegates in a static constructor, rather than in field initializers, to ensure that this happens in advance.
     // This will prevent unpredictable CLR behavior related to the 'beforefieldinit' flag, which could lead to the compilation of these
     // delegates immediately before the invocation of the Equals and GetHashCode methods, which may be undesirable.
@@ -28,7 +29,7 @@ public abstract class ValueType<T> where T : ValueType<T>
         tObjectsComparer = CreateEqualsFunc();
         tObjectHashCodeGenerator = CreateHashCodeFunc();
     }
-    
+
     public override bool Equals(object? otherObj)
     {
         return otherObj is T otherT && Equals(otherT);
@@ -100,13 +101,13 @@ public abstract class ValueType<T> where T : ValueType<T>
         // Define one T-type parameter for an object whose hash code we are calculating.
         var tObjParam = Expression.Parameter(typeof(T), "tObj");
         var hashCodeExpressions = new List<Expression>(propertiesInfo.Length);
-        
+
         // For each property, we call the GetHashCode method.
         foreach (var propertyInfo in propertiesInfo)
         {
             var propertyAccess = Expression.Property(tObjParam, propertyInfo);
             var getHashCodeCall = Expression.Call(propertyAccess, "GetHashCode", null);
-            
+
             // For value-types, further null-checks are not appropriate and will cause execution-errors.
             if (propertyInfo.PropertyType.IsValueType)
             {
@@ -114,11 +115,11 @@ public abstract class ValueType<T> where T : ValueType<T>
                 hashCodeExpressions.Add(getHashCodeCall);
                 continue;
             }
-            
+
             // Check that "p.GetHashCode()" expression will not fall with the NullReferenceException.
             var isPropertyNotNull = Expression.NotEqual(propertyAccess, Expression.Constant(null, propertyInfo.PropertyType));
             var safeGetHashCodeCall = Expression.Condition(isPropertyNotNull, getHashCodeCall, Expression.Constant(0, typeof(int)));
-            
+
             // Add "p != null ? p.GetHashCode() : 0" expressions.
             hashCodeExpressions.Add(safeGetHashCodeCall);
         }

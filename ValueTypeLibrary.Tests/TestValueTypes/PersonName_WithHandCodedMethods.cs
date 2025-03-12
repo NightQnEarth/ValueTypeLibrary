@@ -7,7 +7,7 @@ public class PersonName_WithHandCodedMethods : ValueType<PersonName>
 {
     public string? FirstName { get; }
     public string? LastName { get; }
-    
+
     public PersonName_WithHandCodedMethods(string? firstName, string? lastName)
     {
         FirstName = firstName;
@@ -31,10 +31,10 @@ public class PersonName_WithHandCodedMethods : ValueType<PersonName>
         unchecked
         {
             var hashCode = 17;
-            
+
             hashCode = hashCode * 31 + FirstName?.GetHashCode() ?? 0;
             hashCode = hashCode * 31 + LastName?.GetHashCode() ?? 0;
-            
+
             return hashCode;
         }
     }
