@@ -25,53 +25,53 @@ public class ValueType_PerformanceTests
             Enumerable.Range(1, TestIterationsCount)
                       .Select(n => new PersonName(new string('f', n % 10), new string('s', n % 10)))
                       .ToImmutableArray();
-        
+
         handCodedPersonNames =
             Enumerable.Range(1, TestIterationsCount)
                       .Select(n => new PersonName_WithHandCodedMethods(new string('f', n % 10), new string('s', n % 10)))
                       .ToImmutableArray();
     }
-    
+
     [Test]
     public void EqualsPerformance()
     {
         new PersonName("", "").Equals(new PersonName("", ""));
         new PersonName_WithHandCodedMethods("", "").Equals(new PersonName_WithHandCodedMethods("", ""));
-        
-        var sw = Stopwatch.StartNew();
+
+        var stopwatch = Stopwatch.StartNew();
         for (var i = 0; i < TestIterationsCount; i++)
         {
             personNames[i].Equals(personNames[TestIterationsCount - 1 - i]);
         }
-        Console.WriteLine("ValueType<T> Equals: " + sw.Elapsed.TotalSeconds);
-        
-        sw.Restart();
+        Console.WriteLine($"ValueType<T> Equals: {stopwatch.Elapsed.TotalSeconds}");
+
+        stopwatch.Restart();
         for (var i = 0; i < TestIterationsCount; i++)
         {
             handCodedPersonNames[i].Equals(handCodedPersonNames[TestIterationsCount - 1 - i]);
         }
-        Console.WriteLine("Hand coded Equals:   " + sw.Elapsed.TotalSeconds);
+        Console.WriteLine($"Hand coded Equals:   {stopwatch.Elapsed.TotalSeconds}");
     }
-    
+
     [Test]
     [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")] // Calling for testing purposes.
     public void GetHashCodePerformance()
     {
         new PersonName("", "").GetHashCode();
         new PersonName_WithHandCodedMethods("", "").GetHashCode();
-        
-        var sw = Stopwatch.StartNew();
+
+        var stopwatch = Stopwatch.StartNew();
         foreach (var personName in personNames)
         {
             personName.GetHashCode();
         }
-        Console.WriteLine("ValueType<T> GetHashCode: " + sw.Elapsed.TotalSeconds);
-        
-        sw.Restart();
+        Console.WriteLine($"ValueType<T> GetHashCode: {stopwatch.Elapsed.TotalSeconds}");
+
+        stopwatch.Restart();
         foreach (var handCodedPersonName in handCodedPersonNames)
         {
             handCodedPersonName.GetHashCode();
         }
-        Console.WriteLine("Hand coded GetHashCode:   " + sw.Elapsed.TotalSeconds);
+        Console.WriteLine($"Hand coded GetHashCode:   {stopwatch.Elapsed.TotalSeconds}");
     }
 }
